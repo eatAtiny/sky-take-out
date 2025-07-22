@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static com.sky.constant.PasswordConstant.DEFAULT_PASSWORD;
 
@@ -82,8 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateTime(LocalDateTime.now());
         employee.setCreateUser(BaseContext.getCurrentId());
         employee.setUpdateUser(BaseContext.getCurrentId());
-        //TODO id需要使用雪花算法生成
-        employee.setId(1L);
+
         //4、保存数据
         employeeMapper.insert(employee);
         return employee;
@@ -96,6 +96,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        //1、判断状态值是否正确
+        if (!Objects.equals(status, StatusConstant.ENABLE) && !Objects.equals(status, StatusConstant.DISABLE)) {
+            throw new RuntimeException("状态值不正确");
+        }
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .updateUser(BaseContext.getCurrentId())
+                .updateTime(LocalDateTime.now())
+                .build();
+        //2、修改状态值
+        employeeMapper.update(employee);
     }
 
 }
