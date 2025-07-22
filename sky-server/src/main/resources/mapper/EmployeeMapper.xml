@@ -18,7 +18,7 @@
             <if test="name != null and name != ''">name = #{name},</if>
             <if test="username != null and username != ''">username = #{username},</if>
             <if test="password != null and password != ''">password = #{password},</if>
-            <if test="sex != null and sex != ''">gender = #{sex},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
             <if test="phone!= null and phone!= ''">phone = #{phone},</if>
             <if test="idNumber!= null and idNumber!= ''">id_number = #{idNumber},</if>
             <if test="status!= null">status = #{status},</if>
