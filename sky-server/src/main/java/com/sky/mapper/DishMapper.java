@@ -24,6 +24,13 @@ public interface DishMapper {
     Integer countByCategoryId(Long categoryId);
 
     /**
+     * 根据id查询菜品
+     * @param id 菜品id
+     */
+    @Select("select * from dish where id = #{id}")
+    Dish getById(Long id);
+
+    /**
      * 插入菜品
      * @param dish 菜品信息
      */
@@ -36,5 +43,12 @@ public interface DishMapper {
      * @return 分页查询结果
      */
     Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+
+    /**
+     * 批量删除
+     * @param ids 菜品id集合
+     */
+
+    void deleteBatch(List<Long> ids);
 
 }
