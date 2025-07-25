@@ -65,4 +65,11 @@ public interface DishMapper {
     @Select("select * from dish where category_id = #{id}")
     List<Dish> list(Long categoryId);
 
+    /**
+     * 条件查询菜品
+     * @param dish
+     * @return 菜品信息列表
+     */
+    List<Dish> listWithDish(Dish dish);
+
 }
