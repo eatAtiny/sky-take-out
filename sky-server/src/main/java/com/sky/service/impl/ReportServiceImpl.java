@@ -5,10 +5,7 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ReportMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderStatisticsVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.vo.*;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.StringUtil;
@@ -63,8 +60,41 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public OrderStatisticsVO getOrderStatistics(LocalDate begin, LocalDate end) {
-        return null;
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        // 1. 计算日期范围
+        List<LocalDate> dateList = new ArrayList<>();
+        dateList.add(begin);
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+        // 2. 构建订单数据队列
+        List<Integer> orderCountList = new ArrayList<>();
+        List<Integer> validOrderCountList = new ArrayList<>();
+        // 3. 遍历日期范围，计算每一天的订单统计
+        for (LocalDate date : dateList) {
+            // 4. 调用订单服务，查询该天的订单统计
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+            Map<String, Object> map = new HashMap<>();
+            map.put("beginTime", beginTime);
+            map.put("endTime", endTime);
+            Integer orderCount = orderMapper.getOrderCount(map);
+            orderCount = orderCount == null ? 0 : orderCount;
+            orderCountList.add(orderCount);
+            map.put("status", Orders.COMPLETED);
+            Integer validOrderCount = orderMapper.getOrderCount(map);
+            validOrderCount = validOrderCount == null ? 0 : validOrderCount;
+            validOrderCountList.add(validOrderCount);
+        }
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .orderCountList(StringUtils.join(orderCountList, ","))
+                .validOrderCountList(StringUtils.join(validOrderCountList, ","))
+                .totalOrderCount(orderCountList.stream().mapToInt(Integer::intValue).sum())
+                .validOrderCount(validOrderCountList.stream().mapToInt(Integer::intValue).sum())
+                .orderCompletionRate(validOrderCountList.stream().mapToInt(Integer::intValue).sum() * 1.0 / orderCountList.stream().mapToInt(Integer::intValue).sum())
+                .build();
     }
 
     @Override
