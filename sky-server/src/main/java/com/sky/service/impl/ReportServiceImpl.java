@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ReportMapper;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -135,6 +137,15 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
-        return null;
+        // 1. 调用订单服务，查询销售Top10
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+        List<GoodsSalesDTO> list = orderMapper.getSalesTop10(beginTime, endTime);
+        // 2. 构建VO对象
+        SalesTop10ReportVO vo = SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(list.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList()), ","))
+                .numberList(StringUtils.join(list.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList()), ","))
+                .build();
+        return vo;
     }
 }
