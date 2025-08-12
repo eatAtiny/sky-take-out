@@ -2,6 +2,7 @@ package com.sky.service;
 
 import com.sky.vo.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 
 public interface ReportService {
@@ -36,4 +37,10 @@ public interface ReportService {
      * @return 销量排名VO
      */
     SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end);
+
+    /**
+     * 导出数据
+     * @param response 响应对象
+     */
+    void exportBusinessData(HttpServletResponse response);
 }
